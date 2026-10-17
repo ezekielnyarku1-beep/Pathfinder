@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173334">
+  <title>Pathfinder | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#dashboard" aria-label="Pathfinder home">
+      <span class="brand-icon">P</span>
+      <span class="brand-copy"><strong>Pathfinder</strong><small>Asset Traceability</small></span>
+    </a>
+
+    <nav class="navigation" aria-label="Main navigation">
+      <a class="nav-link active" href="#dashboard"><span class="nav-icon">⌂</span>Dashboard</a>
+      <a class="nav-link" href="#kiosks"><span class="nav-icon">▦</span>Kiosks</a>
+      <button class="nav-link nav-link-disabled" type="button" disabled title="Components page is not available yet"><span class="nav-icon">◈</span>Components</button>
+      <button class="nav-link nav-link-disabled" type="button" disabled title="Event logging page is not available yet"><span class="nav-icon">＋</span>Log an Event</button>
+      <button class="nav-link nav-link-disabled" type="button" disabled title="Fault history page is not available yet"><span class="nav-icon">◷</span>Fault History</button>
+      <a class="nav-link" href="#alerts"><span class="nav-icon">!</span>Alerts</a>
+      <button class="nav-link nav-link-disabled" type="button" disabled title="Reports page is not available yet"><span class="nav-icon">▤</span>Reports</button>
+      <div class="nav-divider"></div>
+      <button class="nav-link nav-link-disabled" type="button" disabled title="User management page is not available yet"><span class="nav-icon">♙</span>Users</button>
+      <button class="nav-link nav-link-disabled" type="button" disabled title="Audit log page is not available yet"><span class="nav-icon">☷</span>Audit Log</button>
+      <button class="nav-link account-nav-link" type="button" id="accountButton"><span class="nav-icon">♙</span>Account</button>
+    </nav>
+
+    <div class="sidebar-footer"><span class="online-dot"></span><span id="systemStatus">Connecting to services…</span></div>
+  </aside>
+
+  <main class="main-content" id="dashboard">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-button" id="menuButton" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <h2>Dashboard</h2>
+      </div>
+      <div class="account-area">
+        <div class="user-label"><strong id="currentUserName">PATHFINDER</strong><small id="currentUserRole">Account</small></div>
+        <button class="outline-button" type="button" id="signOutButton">Sign out</button>
+      </div>
+    </header>
+
+    <section class="page-content">
+      <div class="welcome">
+        <h1>Good day</h1>
+        <p>Here's what's happening across your kiosks.</p>
+      </div>
+      <p class="dashboard-status" id="dashboardStatus" role="status" aria-live="polite" hidden></p>
+
+      <section class="stats-grid" aria-label="Dashboard summary">
+        <article class="stat-card"><p>Active kiosks</p><strong id="activeKiosksCount">0</strong></article>
+        <article class="stat-card"><p>Components</p><strong id="componentsCount">0</strong></article>
+        <article class="stat-card"><p>Movements today</p><strong id="movementsTodayCount">0</strong></article>
+        <article class="stat-card"><p>Open alerts</p><strong id="openAlertsCount">0</strong></article>
+      </section>
+
+      <section class="quick-actions" aria-labelledby="quickActionsTitle">
+        <h3 id="quickActionsTitle">Quick actions</h3>
+        <div class="action-buttons">
+          <button class="button button-primary" type="button" disabled title="Event logging page is not available yet">Log an event</button>
+          <button class="button button-secondary" type="button" disabled title="Component search page is not available yet">Find a component</button>
+          <a class="button button-secondary" href="#kiosks">View kiosks</a>
+        </div>
+      </section>
+
+      <section class="lower-grid">
+        <article class="content-card" id="kiosks">
+          <div class="section-heading"><div><h3>Kiosk overview</h3><p>Keep track of your registered kiosks.</p></div><a href="#kiosks" class="text-link">View all</a></div>
+          <div id="kioskOverviewEmpty" class="empty-state"><span class="empty-icon">▦</span><strong>No kiosk data yet</strong><p>Kiosk records will appear here when they are added.</p></div>
+          <div id="kioskOverviewList" class="data-list" hidden></div>
+        </article>
+        <article class="content-card" id="alerts">
+          <div class="section-heading"><div><h3>Recent alerts</h3><p>Items that may need your attention.</p></div><a href="#alerts" class="text-link">View all</a></div>
+          <div id="alertListEmpty" class="empty-state"><span class="empty-icon">✓</span><strong>You're all caught up</strong><p>New alerts will be listed here.</p></div>
+          <div id="alertList" class="data-list" hidden></div>
+        </article>
+      </section>
+      <div class="footer-note">Pathfinder · Asset Traceability</div>
+    </section>
+  </main>
+  <dialog class="account-dialog" id="accountDialog" aria-labelledby="accountDialogTitle">
+    <form class="account-form" id="accountForm">
+      <div class="account-dialog-heading">
+        <div><span class="login-eyebrow">PROFILE</span><h2 id="accountDialogTitle">Account settings</h2></div>
+        <button class="dialog-close" type="button" id="closeAccountDialog" aria-label="Close account settings">×</button>
+      </div>
+      <p class="account-dialog-intro">Update your name or password.</p>
+      <p class="account-form-message" id="accountMessage" role="status" hidden></p>
+      <label class="login-label" for="profileName">Name</label>
+      <input class="login-input" id="profileName" autocomplete="name" required>
+      <label class="login-label account-field-label" for="profileEmail">Email</label>
+      <input class="login-input" id="profileEmail" type="email" disabled>
+      <label class="login-label account-field-label" for="currentPassword">Current password</label>
+      <input class="login-input" id="currentPassword" type="password" autocomplete="current-password" required>
+      <label class="login-label account-field-label" for="profileNewPassword">New password <span>(optional)</span></label>
+      <input class="login-input" id="profileNewPassword" type="password" autocomplete="new-password" minlength="6">
+      <label class="login-label account-field-label" for="profileConfirmPassword">Confirm new password</label>
+      <input class="login-input" id="profileConfirmPassword" type="password" autocomplete="new-password">
+      <button class="login-submit" id="saveAccountButton" type="submit">Save changes</button>
+    </form>
+  </dialog>
+  <script>
+    if (window.location.protocol === 'file:') {
+      window.location.replace('http://127.0.0.1:3001/');
+    }
+    const configuredApiBase = localStorage.getItem('pathfinderApiBase');
+    const isLocalPreview = window.location.protocol === 'file:'
+      || (['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname)
+        && window.location.port !== ''
+        && window.location.port !== '3001');
+    const API_BASE = (configuredApiBase || (isLocalPreview ? 'http://127.0.0.1:3001' : '')).replace(/\/$/, '');
+    const token = localStorage.getItem('pathfinderToken');
+    let currentUser = {};
+    try {
+      currentUser = JSON.parse(localStorage.getItem('pathfinderUser') || '{}');
+    } catch (error) {
+      console.warn('Could not read the saved Pathfinder profile:', error);
+    }
+
+    const statFields = {
+      activeKiosksCount: document.getElementById('activeKiosksCount'),
+      componentsCount: document.getElementById('componentsCount'),
+      movementsTodayCount: document.getElementById('movementsTodayCount'),
+      openAlertsCount: document.getElementById('openAlertsCount')
+    };
+    const dashboardStatus = document.getElementById('dashboardStatus');
+    const systemStatus = document.getElementById('systemStatus');
+    document.getElementById('currentUserName').textContent = currentUser.name || 'PATHFINDER';
+    document.getElementById('currentUserRole').textContent = currentUser.role || 'Account';
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[character]);
+    }
+
+    function setStat(id, value) {
+      const target = statFields[id];
+      if (target) target.textContent = value;
+    }
+
+    function renderKioskOverview(rows) {
+      const empty = document.getElementById('kioskOverviewEmpty');
+      const list = document.getElementById('kioskOverviewList');
+
+      if (!rows || rows.length === 0) {
+        empty.hidden = false;
+        list.hidden = true;
+        list.innerHTML = '';
+        return;
+      }
+
+      empty.hidden = true;
+      list.hidden = false;
+      list.innerHTML = rows.map((row) => `
+        <div class="mini-row">
+          <div>
+            <strong>${escapeHtml(row.kiosk_code || row.id)}</strong>
+            <small>${escapeHtml(row.location || 'Unassigned location')}</small>
+          </div>
+          <span>${escapeHtml(row.component_count ?? 0)} components</span>
+        </div>
+      `).join('');
+    }
+
+    function renderAlerts(rows) {
+      const empty = document.getElementById('alertListEmpty');
+      const list = document.getElementById('alertList');
+
+      if (!rows || rows.length === 0) {
+        empty.hidden = false;
+        list.hidden = true;
+        list.innerHTML = '';
+        return;
+      }
+
+      empty.hidden = true;
+      list.hidden = false;
+      list.innerHTML = rows.slice(0, 5).map((row) => `
+        <div class="mini-row alert-row">
+          <div>
+            <strong>${escapeHtml(row.kiosk_code || row.component_serial || 'Asset alert')}</strong>
+            <small>${escapeHtml(row.severity || 'Unspecified')} · ${escapeHtml(row.status || 'Open')}</small>
+          </div>
+          <span>${escapeHtml((row.description || 'Fault logged').slice(0, 28))}${(row.description || '').length > 28 ? '…' : ''}</span>
+        </div>
+      `).join('');
+    }
+
+    async function fetchJson(url, options = {}) {
+      const headers = new Headers(options.headers || {});
+
+      
+      if (token) {
+        headers.set('Authorization', 'Bearer ' + token);
+      }
+
+      if (options.body && !headers.has('Content-Type') && !(options.body instanceof FormData)) {
+        headers.set('Content-Type', 'application/json');
+      }
+
+      const response = await fetch(`${API_BASE}${url}`, {
+        ...options,
+        headers
+      });
+
+      const contentType = response.headers.get('content-type') || '';
+      const payload = contentType.includes('application/json') ? await response.json() : await response.text();
+
+      if (!response.ok) {
+        throw new Error(payload && payload.message ? payload.message : 'Request failed');
+      }
+
+      return payload;
+    }
+
+    async function loadDashboard() {
+      const results = await Promise.allSettled([
+          fetchJson('/api/dashboard/stats'),
+          fetchJson('/api/kiosks?limit=5'),
+          fetchJson('/api/faults?status=Open')
+      ]);
+
+      const errors = [];
+      const [statsResult, kiosksResult, faultsResult] = results;
+      if (statsResult.status === 'fulfilled') {
+        const stats = statsResult.value;
+        setStat('activeKiosksCount', stats.active_kiosks ?? 0);
+        setStat('componentsCount', stats.components ?? 0);
+        setStat('movementsTodayCount', stats.movements_today ?? 0);
+        setStat('openAlertsCount', stats.open_alerts ?? 0);
+      } else {
+        errors.push(`Statistics: ${statsResult.reason.message}`);
+      }
+
+      if (kiosksResult.status === 'fulfilled') {
+        renderKioskOverview(kiosksResult.value.data || []);
+      } else {
+        errors.push(`Kiosks: ${kiosksResult.reason.message}`);
+      }
+
+      if (faultsResult.status === 'fulfilled') {
+        renderAlerts(Array.isArray(faultsResult.value) ? faultsResult.value : []);
+      } else {
+        errors.push(`Alerts: ${faultsResult.reason.message}`);
+      }
+
+      if (errors.length) {
+        console.error('Some dashboard data could not be loaded:', errors);
+        dashboardStatus.textContent = `Some live dashboard data could not be loaded. ${errors.join(' · ')}`;
+        dashboardStatus.hidden = false;
+        systemStatus.textContent = 'Service issues detected';
+      } else {
+        dashboardStatus.hidden = true;
+        systemStatus.textContent = 'System operational';
+      }
+    }
+
+    const menuButton = document.getElementById('menuButton');
+    const sidebar = document.getElementById('sidebar');
+    menuButton.addEventListener('click', () => {
+      const isOpen = sidebar.classList.toggle('sidebar-open');
+      menuButton.setAttribute('aria-expanded', String(isOpen));
+    });
+    document.querySelectorAll('a.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelectorAll('a.nav-link').forEach(item => item.classList.remove('active'));
+        link.classList.add('active');
+        if (window.innerWidth <= 680) {
+          sidebar.classList.remove('sidebar-open');
+          menuButton.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+    document.getElementById('accountButton').addEventListener('click', () => {
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+      document.getElementById('accountMessage').hidden = true;
+      document.getElementById('accountForm').reset();
+      document.getElementById('profileName').value = currentUser.name || '';
+      document.getElementById('profileEmail').value = currentUser.email || '';
+      document.getElementById('accountDialog').showModal();
+    });
+    document.getElementById('closeAccountDialog').addEventListener('click', () => {
+      document.getElementById('accountDialog').close();
+    });
+    document.getElementById('accountForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const message = document.getElementById('accountMessage');
+      const newPassword = document.getElementById('profileNewPassword').value;
+      const confirmPassword = document.getElementById('profileConfirmPassword').value;
+      if (!form.reportValidity()) return;
+      if (newPassword !== confirmPassword) {
+        message.textContent = 'The new passwords do not match.';
+        message.classList.add('account-error');
+        message.hidden = false;
+        return;
+      }
+
+      const button = document.getElementById('saveAccountButton');
+      button.disabled = true;
+      button.textContent = 'Saving…';
+      try {
+        const result = await fetchJson('/api/auth/password', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: document.getElementById('profileName').value.trim(),
+            currentPassword: document.getElementById('currentPassword').value,
+            newPassword
+          })
+        });
+        if (result.token) localStorage.setItem('pathfinderToken', result.token);
+        if (result.user) {
+          currentUser = result.user;
+          localStorage.setItem('pathfinderUser', JSON.stringify(currentUser));
+          document.getElementById('currentUserName').textContent = currentUser.name;
+          document.getElementById('currentUserRole').textContent = currentUser.role;
+        }
+        document.getElementById('profileNewPassword').value = '';
+        document.getElementById('profileConfirmPassword').value = '';
+        document.getElementById('currentPassword').value = '';
+        message.textContent = result.message || 'Account updated.';
+        message.classList.remove('account-error');
+        message.hidden = false;
+      } catch (error) {
+        message.textContent = error.message;
+        message.classList.add('account-error');
+        message.hidden = false;
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Save changes';
+      }
+    });
+    document.getElementById('signOutButton').addEventListener('click', async () => {
+      try {
+        if (token) await fetchJson('/api/auth/logout', { method: 'POST' });
+      } catch (error) {
+        console.error('Server sign-out failed; clearing the local session:', error);
+      } finally {
+        localStorage.removeItem('pathfinderToken');
+        localStorage.removeItem('pathfinderUser');
+        window.location.href = 'login.html';
+      }
+    });
+
+    if (!token) {
+      window.location.replace('login.html');
+    } else {
+      loadDashboard();
+    }
+  </script>
+</body>
+</html>

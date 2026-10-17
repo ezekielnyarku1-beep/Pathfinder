@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173334">
+  <title>Sign in | Pathfinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+  <main class="login-layout">
+    <section class="login-brand-panel" aria-label="Pathfinder">
+      <a class="brand login-brand" href="index.html" aria-label="Pathfinder home">
+        <span class="brand-icon">P</span>
+        <span class="brand-copy"><strong>Pathfinder</strong><small>Asset Traceability</small></span>
+      </a>
+      <div class="login-brand-message">
+        <span class="login-eyebrow">MINI KIOSK OPERATIONS</span>
+        <h1>Know every part.<br>Trace every move.</h1>
+        <p>Keep kiosk components, service history, and maintenance activity connected in one place.</p>
+      </div>
+      <span class="login-brand-footer">Pathfinder · Asset Traceability</span>
+    </section>
+
+    <section class="login-form-panel">
+      <form class="login-card" id="loginForm" novalidate>
+        <span class="login-eyebrow">WELCOME BACK</span>
+        <h2>Sign in to Pathfinder</h2>
+        <p class="login-intro">Enter your account details to continue.</p>
+
+        <div class="login-error" id="loginError" role="alert" hidden></div>
+
+        <label class="login-label" for="email">Email address</label>
+        <input class="login-input" id="email" name="email" type="email" autocomplete="username" placeholder="you@company.com" required>
+
+        <div class="password-label-row">
+          <label class="login-label" for="password">Password</label>
+          <a class="login-text-link" href="#" id="forgotPasswordLink">Forgot password?</a>
+        </div>
+        <div class="password-input-wrap">
+          <input class="login-input" id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+          <button class="password-toggle" id="passwordToggle" type="button" aria-label="Show password" aria-pressed="false">Show</button>
+        </div>
+
+        <button class="login-submit" id="loginSubmit" type="submit">
+          <span id="submitLabel">Sign in</span>
+          <span class="login-spinner" id="loginSpinner" aria-hidden="true" hidden></span>
+        </button>
+        <p class="login-switch">New to Pathfinder? <button class="login-text-button" type="button" id="showRegister">Sign up</button></p>
+        <p class="login-footnote">Authorized Pathfinder users only.</p>
+      </form>
+
+      <form class="login-card" id="registerForm" novalidate hidden>
+        <span class="login-eyebrow">GET STARTED</span>
+        <h2>Create your account</h2>
+        <p class="login-intro">Register to access Pathfinder asset tracking.</p>
+        <div class="login-error" id="registerError" role="alert" hidden></div>
+
+        <label class="login-label" for="registerName">Full name</label>
+        <input class="login-input" id="registerName" name="name" autocomplete="name" placeholder="Your name" required>
+
+        <label class="login-label register-field-label" for="registerEmail">Email address</label>
+        <input class="login-input" id="registerEmail" name="email" type="email" autocomplete="email" placeholder="you@company.com" required>
+
+        <label class="login-label register-field-label" for="registerPassword">Password</label>
+        <input class="login-input" id="registerPassword" name="password" type="password" autocomplete="new-password" minlength="6" placeholder="At least 6 characters" required>
+
+        <label class="login-label register-field-label" for="registerConfirmPassword">Confirm password</label>
+        <input class="login-input" id="registerConfirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="6" placeholder="Enter your password again" required>
+
+        <button class="login-submit" id="registerSubmit" type="submit">
+          <span id="registerSubmitLabel">Sign up</span>
+          <span class="login-spinner" id="registerSpinner" aria-hidden="true" hidden></span>
+        </button>
+        <p class="login-switch">Already have an account? <button class="login-text-button" type="button" id="showLogin">Sign in</button></p>
+      </form>
+
+      <form class="login-card" id="passwordChangeForm" hidden>
+        <span class="login-eyebrow">ACCOUNT SETUP</span>
+        <h2>Update your password</h2>
+        <p class="login-intro">Your administrator requires you to set a new password before continuing.</p>
+        <div class="login-error" id="passwordChangeError" role="alert" hidden></div>
+        <label class="login-label" for="accountName">Name</label>
+        <input class="login-input" id="accountName" autocomplete="name" required>
+        <label class="login-label" for="newPassword">New password</label>
+        <input class="login-input" id="newPassword" type="password" autocomplete="new-password" minlength="6" required>
+        <label class="login-label password-confirm-label" for="confirmPassword">Confirm new password</label>
+        <input class="login-input" id="confirmPassword" type="password" autocomplete="new-password" minlength="6" required>
+        <button class="login-submit" type="submit">Update password</button>
+        <p class="login-footnote">Use at least 6 characters.</p>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    if (window.location.protocol === 'file:') {
+      window.location.replace('http://127.0.0.1:3001/login.html');
+    }
+    const configuredApiBase = localStorage.getItem('pathfinderApiBase');
+    const isLocalPreview = window.location.protocol === 'file:'
+      || (['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname)
+        && window.location.port !== ''
+        && window.location.port !== '3001');
+    const API_BASE = (configuredApiBase || (isLocalPreview ? 'http://127.0.0.1:3001' : '')).replace(/\/$/, '');
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorBox = document.getElementById('loginError');
+    const submitButton = document.getElementById('loginSubmit');
+    const submitLabel = document.getElementById('submitLabel');
+    const spinner = document.getElementById('loginSpinner');
+    const registerForm = document.getElementById('registerForm');
+    const registerError = document.getElementById('registerError');
+    const registerSubmit = document.getElementById('registerSubmit');
+    const registerSubmitLabel = document.getElementById('registerSubmitLabel');
+    const registerSpinner = document.getElementById('registerSpinner');
+    const passwordChangeForm = document.getElementById('passwordChangeForm');
+    let authenticatedToken = '';
+
+    function showLoginMessage(message) {
+      loginForm.hidden = false;
+      registerForm.hidden = true;
+      passwordChangeForm.hidden = true;
+      errorBox.textContent = message;
+      errorBox.classList.add('login-notice');
+      errorBox.hidden = false;
+    }
+
+    document.getElementById('showRegister').addEventListener('click', () => {
+      loginForm.hidden = true;
+      passwordChangeForm.hidden = true;
+      registerForm.hidden = false;
+      errorBox.hidden = true;
+      registerError.hidden = true;
+      document.getElementById('registerName').focus();
+    });
+
+    document.getElementById('showLogin').addEventListener('click', () => {
+      registerForm.hidden = true;
+      passwordChangeForm.hidden = true;
+      loginForm.hidden = false;
+      registerError.hidden = true;
+      errorBox.hidden = true;
+      emailInput.focus();
+    });
+
+    function showError(element, message, isNotice = false) {
+      element.textContent = message;
+      element.classList.toggle('login-notice', isNotice);
+      element.hidden = false;
+    }
+
+    function setSubmitting(isSubmitting) {
+      submitButton.disabled = isSubmitting;
+      submitLabel.textContent = isSubmitting ? 'Signing in…' : 'Sign in';
+      spinner.hidden = !isSubmitting;
+    }
+
+    document.getElementById('passwordToggle').addEventListener('click', (event) => {
+      const toggle = event.currentTarget;
+      const isVisible = passwordInput.type === 'text';
+      passwordInput.type = isVisible ? 'password' : 'text';
+      toggle.textContent = isVisible ? 'Show' : 'Hide';
+      toggle.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password');
+      toggle.setAttribute('aria-pressed', String(!isVisible));
+    });
+
+    document.getElementById('forgotPasswordLink').addEventListener('click', async (event) => {
+      event.preventDefault();
+      const email = emailInput.value.trim();
+      if (!email) {
+        showError(errorBox, 'Enter your email address first, then choose Forgot password again.');
+        emailInput.focus();
+        return;
+      }
+
+      errorBox.hidden = true;
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Unable to request a password reset.');
+        showError(errorBox, result.message, true);
+      } catch (error) {
+        showError(errorBox, error instanceof TypeError
+          ? 'Pathfinder could not reach its API. Start the Pathfinder API, then try again.'
+          : error.message || 'Unable to reach the Pathfinder service. Try again later.');
+      }
+    });
+
+    registerForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      registerError.hidden = true;
+
+      if (!registerForm.reportValidity()) return;
+
+      const name = document.getElementById('registerName').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+      if (password !== confirmPassword) {
+        showError(registerError, 'The passwords do not match.');
+        return;
+      }
+
+      registerSubmit.disabled = true;
+      registerSubmitLabel.textContent = 'Creating account…';
+      registerSpinner.hidden = false;
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Unable to create your account.');
+
+        emailInput.value = email;
+        showLoginMessage('Your account has been created. Sign in to continue.');
+        passwordInput.focus();
+      } catch (error) {
+        showError(registerError, error instanceof TypeError
+          ? 'Pathfinder could not reach its API. Start the Pathfinder API, then try again.'
+          : error.message || 'Unable to reach the Pathfinder service. Check your connection and try again.');
+      } finally {
+        registerSubmit.disabled = false;
+        registerSubmitLabel.textContent = 'Sign up';
+        registerSpinner.hidden = true;
+      }
+    });
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorBox.hidden = true;
+      errorBox.classList.remove('login-notice');
+
+      if (!loginForm.reportValidity()) return;
+
+      setSubmitting(true);
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: emailInput.value.trim(),
+            password: passwordInput.value
+          })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Unable to sign in.');
+        if (!result.token || !result.user) throw new Error('The sign-in response was incomplete. Please contact your administrator.');
+
+        authenticatedToken = result.token;
+        localStorage.setItem('pathfinderUser', JSON.stringify(result.user));
+        if (result.user.mustChangePassword) {
+          document.getElementById('accountName').value = result.user.name || '';
+          loginForm.hidden = true;
+          passwordChangeForm.hidden = false;
+          document.getElementById('accountName').focus();
+          return;
+        }
+        authenticatedToken = result.token || authenticatedToken;
+        localStorage.setItem('pathfinderToken', authenticatedToken);
+        window.location.href = 'index.html';
+      } catch (error) {
+        showError(errorBox, error instanceof TypeError
+          ? 'Pathfinder could not reach its API. Start the Pathfinder API, then try again.'
+          : error.message || 'Unable to reach the Pathfinder service. Check your connection and try again.');
+      } finally {
+        setSubmitting(false);
+      }
+    });
+
+    passwordChangeForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const accountName = document.getElementById('accountName').value.trim();
+      const changeError = document.getElementById('passwordChangeError');
+      changeError.hidden = true;
+
+      if (!passwordChangeForm.reportValidity()) return;
+      if (newPassword !== confirmPassword) {
+        showError(changeError, 'The passwords do not match.');
+        return;
+      }
+
+      const changeButton = passwordChangeForm.querySelector('button[type="submit"]');
+      changeButton.disabled = true;
+      changeButton.textContent = 'Updating…';
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authenticatedToken}`
+          },
+          body: JSON.stringify({ name: accountName, newPassword })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Unable to update your password.');
+
+        localStorage.setItem('pathfinderToken', authenticatedToken);
+        if (result.user) localStorage.setItem('pathfinderUser', JSON.stringify(result.user));
+        window.location.href = 'index.html';
+      } catch (error) {
+        showError(changeError, error.message || 'Unable to reach the Pathfinder service. Try again later.');
+      } finally {
+        changeButton.disabled = false;
+        changeButton.textContent = 'Update password';
+      }
+    });
+  </script>
+</body>
+</html>
